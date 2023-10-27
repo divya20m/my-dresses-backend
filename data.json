@@ -1,0 +1,29 @@
+
+[
+    {
+      "id": 1,
+      "occasion": "Casual",
+      "style": "Bohemian",
+      "colors": ["Blue", "Red", "Yellow"],
+      "description": "A comfortable bohemian-style dress with vibrant colors for a relaxed day out.",
+      "imageURL": "https://example.com/dress1.jpg"
+    },
+    {
+      "id": 2,
+      "occasion": "Formal",
+      "style": "Elegant",
+      "colors": ["Black", "Silver"],
+      "description": "An elegant black evening gown with silver accents for a formal event.",
+      "imageURL": "https://example.com/dress2.jpg"
+    },
+    {
+      "id": 3,
+      "occasion": "Workwear",
+      "style": "Professional",
+      "colors": ["Navy Blue", "Gray"],
+      "description": "A professional navy blue suit for a day at the office.",
+      "imageURL": "https://example.com/dress3.jpg"
+    }
+  ]
+  
+  
