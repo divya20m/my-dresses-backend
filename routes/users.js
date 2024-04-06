@@ -1,9 +1,10 @@
 import express from "express";
-import {genPassword,createUser,getUsersByEmail,getAllUsers,forgotPassword,resetPassword,DeleteUsersByEmail} from "../functions.js"
+import {genPassword,createUser,getUsersByEmail,getAllUsers,forgotPassword,resetPassword,DeleteUsersByEmail,addToCart,getCartItems,removeFromCart} from "../functions.js"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import nodemailer from 'nodemailer';
 import 'dotenv/config'
+import { auth } from '../MiddleWare/auth.js';
 
 const router=express.Router()
 
@@ -81,7 +82,7 @@ router.post("/forgot-password", express.json(), async (req, res) => {
 
     const secret = process.env.secretkey;
     const token = jwt.sign({ email: user.email }, secret, { expiresIn: '1h' });
-    const resetLink = `https://my-dresses-frontend.vercel.app/reset-password/${email}/${token}`;
+    const resetLink = `https://my-dresses-frontend.vercel.app/users/reset-password/${email}/${token}`;
     
     //  email message
     const mailOptions = {
@@ -119,6 +120,20 @@ router.get("/reset-password/:email", express.json(), async (req, res) => {
     return res.send(oldUser);
   });
   
+  //get users by email
+  router.get("/:email", express.json(), async (req, res) => {
+    const { email } = req.params;
+    const oldUser = await getUsersByEmail(email)
+  
+    if (!oldUser) {
+      return res.status(404).send({ status: "User Not Exists!!" });
+    }
+  
+    return res.send(oldUser);
+  });
+
+
+
 
   //reset password
   router.post("/reset-password/:email/:token",express.json(), async (req, res) => {
@@ -184,7 +199,45 @@ router.post("/userData", express.json(), async (req, res) => {
   } catch (error) { }
 });
 
+  /////////////////////////////////////////////////
+
+
+//   router.post('/cart', express.json(), auth, async (req, res) => {
+//     try {
+//       const { items } = req.body;
+//       const email = req.user.email;
+//       const result = await addToCart(email, items);
   
+//       res.status(201).json({ message: 'Items added to cart successfully' });
+//     } catch (error) {
+//       console.error('Error adding items to cart:', error);
+//       res.status(500).json({ error: 'Internal server error' });
+//     }
+//   });
+
+//   // retrieve cart items
+//   // router.get('/cart', async (req, res) => {
+//   //   try {
+     
+//   //     const userURLs = await getCartItems(email); 
   
+//   //     res.json(userURLs);
+//   //   } catch (error) {
+//   //     console.log(userURLs)
+//   //     console.error("Error fetching user's shortened URLs:", error);
+//   //     res.status(500).json({ error: "some error" });
+//   //   }
+//   // });
+  
+//   router.get('/cart', async (req, res) => {
+//     try {
+//         const allCartItems = await getCartItems();
+//         const emails = allCartItems.map(item => item.email);
+//         res.json(emails);
+//     } catch (error) {
+//         console.error("Error fetching all cart items:", error);
+//         res.status(500).json({ error: "Internal server error" });
+//     }
+// });
   
 export const usersRouter=router

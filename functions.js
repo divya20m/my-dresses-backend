@@ -40,4 +40,63 @@ export async function genPassword(password) {
         return await client.db("dresses").collection("users-list").deleteOne({ email:email })
     }
 
+  ///////////////////////////////////////////////////
+
+
+  function preprocessRequestBody(items) {
+    return items.map(item => ({
+      id: item.id,
+      quantity: item.quantity
+    }));
+  }
   
+  export async function addToCart(email, items) {
+    try {
+      const processedItems = preprocessRequestBody(items);
+      const existingCart = await client.db("dresses").collection("cart").findOne({ email });
+  
+      if (existingCart) {
+        const mergedItems = mergeItems(existingCart.items, processedItems);
+        return  await client.db("dresses").collection("cart").updateOne(
+          { email },
+          { $set: { items: mergedItems } }
+        );
+      } else {
+        const cartItem = {
+          email: email,
+          items: processedItems
+        };
+        return await client.db("dresses").collection("cart").insertOne(cartItem);
+      }
+    } catch (error) {
+      throw new Error('Error adding items to cart: ' + error.message);
+    }
+  }
+  function mergeItems(existingItems, newItems) {
+    const itemsMap = new Map();
+    existingItems.forEach(item => {
+      itemsMap.set(item.id, item);
+    });
+    newItems.forEach(item => {
+      const existingItem = itemsMap.get(item.id);
+      if (existingItem) {
+        existingItem.quantity = item.quantity;
+      } else {
+        itemsMap.set(item.id, item);
+      }
+    });
+    return Array.from(itemsMap.values());
+  }
+
+
+export async function getCartItems(email) {
+    return await client.db("dresses").collection("cart").find({email:email}).toArray();
+}
+
+export async function removeFromCart(email, id) {
+  return await client.db("dresses").collection("cart").updateOne(
+    { email },
+    { $pull: { items: { id: id } } }
+);
+}
+

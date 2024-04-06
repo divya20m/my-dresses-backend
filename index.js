@@ -4,6 +4,8 @@ import 'dotenv/config'
 import { dressesRouter } from "./routes/lists.js";
 import { usersRouter } from "./routes/users.js";
 import cors from "cors";
+import {getCartItems} from "./functions.js";
+import { cartrouter } from "./routes/cart.js";
 export const app=express()
 const PORT=9000
 app.use(cors());
@@ -27,6 +29,7 @@ app.get('/',async(req,res)=>{
 
 app.use('/dresses',dressesRouter)
 app.use('/users',usersRouter)
+app.use('/cart',cartrouter)
 
 app.listen(PORT,()=>console.log("the port has started in the",PORT))
 
