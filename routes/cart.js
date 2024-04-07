@@ -12,8 +12,8 @@ router.post('/', express.json(), auth, async (req, res) => {
   
       res.status(201).json({ message: 'Items added to cart successfully' });
     } catch (error) {
-      console.error('Error adding items to cart:', error);
-      res.status(500).json({ error: 'Internal server error' });
+        console.error('Error adding items to cart:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
   });
 

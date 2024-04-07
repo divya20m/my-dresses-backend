@@ -25,9 +25,10 @@ export async function genPassword(password) {
         return await client.db("dresses").collection("users-list").findOne({ email })
     }
 
-    export async function getByID(id, token) {
-        return await client.db("dresses").collection("users-list").find({ email })
-    }
+    export async function getByID(email) {
+      return await client.db("dresses").collection("users-list").findOne({ email });
+  }
+  
 
     export async function resetPassword(encryptedPassword, email) {
         return await client.db("dresses").collection("users-list").updateOne(
@@ -43,21 +44,29 @@ export async function genPassword(password) {
   ///////////////////////////////////////////////////
 
 
-  function preprocessRequestBody(items) {
-    return items.map(item => ({
-      id: item.id,
-      quantity: item.quantity
-    }));
+  async function preprocessRequestBody(items) {
+    const processedItems = [];
+    for (const item of items) {
+      const dress = await client.db("dresses").collection("dresses").findOne({ id: item.id });
+      if (!dress) {
+        throw new Error(`Dress with ID ${item.id} not found`);
+      }
+      processedItems.push({
+        id: item.id,
+        quantity: item.quantity || 1 // Default quantity to 1 if not provided
+      });
+    }
+    return processedItems;
   }
   
   export async function addToCart(email, items) {
     try {
-      const processedItems = preprocessRequestBody(items);
+      const processedItems = await preprocessRequestBody(items);
       const existingCart = await client.db("dresses").collection("cart").findOne({ email });
   
       if (existingCart) {
         const mergedItems = mergeItems(existingCart.items, processedItems);
-        return  await client.db("dresses").collection("cart").updateOne(
+        await client.db("dresses").collection("cart").updateOne(
           { email },
           { $set: { items: mergedItems } }
         );
@@ -66,28 +75,27 @@ export async function genPassword(password) {
           email: email,
           items: processedItems
         };
-        return await client.db("dresses").collection("cart").insertOne(cartItem);
+        await client.db("dresses").collection("cart").insertOne(cartItem);
       }
+  
+      return { message: 'Items added to cart successfully' };
     } catch (error) {
       throw new Error('Error adding items to cart: ' + error.message);
     }
   }
+  
   function mergeItems(existingItems, newItems) {
-    const itemsMap = new Map();
-    existingItems.forEach(item => {
-      itemsMap.set(item.id, item);
-    });
-    newItems.forEach(item => {
-      const existingItem = itemsMap.get(item.id);
+    const itemsMap = new Map(existingItems.map(item => [item.id, item]));
+    for (const newItem of newItems) {
+      const existingItem = itemsMap.get(newItem.id);
       if (existingItem) {
-        existingItem.quantity = item.quantity;
+        existingItem.quantity += newItem.quantity;
       } else {
-        itemsMap.set(item.id, item);
+        itemsMap.set(newItem.id, newItem);
       }
-    });
+    }
     return Array.from(itemsMap.values());
   }
-
 
 export async function getCartItems(email) {
     return await client.db("dresses").collection("cart").find({email:email}).toArray();
