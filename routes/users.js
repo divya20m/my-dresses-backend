@@ -202,18 +202,18 @@ router.post("/userData", express.json(), async (req, res) => {
   /////////////////////////////////////////////////
 
 
-//   router.post('/cart', express.json(), auth, async (req, res) => {
-//     try {
-//       const { items } = req.body;
-//       const email = req.user.email;
-//       const result = await addToCart(email, items);
+  // router.post('/cart', express.json(), auth, async (req, res) => {
+  //   try {
+  //     const { items } = req.body;
+  //     const email = req.user.email;
+  //     const result = await addToCart(email, items);
   
-//       res.status(201).json({ message: 'Items added to cart successfully' });
-//     } catch (error) {
-//       console.error('Error adding items to cart:', error);
-//       res.status(500).json({ error: 'Internal server error' });
-//     }
-//   });
+  //     res.status(201).json({ message: 'Items added to cart successfully' });
+  //   } catch (error) {
+  //     console.error('Error adding items to cart:', error);
+  //     res.status(500).json({ error: 'Internal server error' });
+  //   }
+  // });
 
 //   // retrieve cart items
 //   // router.get('/cart', async (req, res) => {

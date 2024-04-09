@@ -6,11 +6,11 @@ const router=express.Router()
 
 router.post('/', express.json(), auth, async (req, res) => {
     try {
-      const { items } = req.body;
+      const { id } = req.body;
       const email = req.user.email;
-      const result = await addToCart(email, items);
+      const result = await addToCart(email, id);
   
-      res.status(201).json({ message: 'Items added to cart successfully' });
+      res.status(201).json({ message: 'Items added to cart successfully' ,result});
     } catch (error) {
         console.error('Error adding items to cart:', error);
         res.status(500).json({ error: 'Internal server error' });
