@@ -44,38 +44,41 @@ export async function genPassword(password) {
   ///////////////////////////////////////////////////
 
   // Modify the addToCart function to add only the ID to the cart collection
-export async function addToCart(email, id) {
-  try {
-    const existingCartItem = await client.db("dresses").collection("cart").findOne({ email });
-
-    if (!existingCartItem) {
-      await client.db("dresses").collection("cart").insertOne({ email, id: [id] });
-      return { message: 'Item added to cart successfully' };
-    } else {
-      await client.db("dresses").collection("cart").updateOne(
-        { email },
-        { $addToSet: { id: id } }
-      );
-      return { message: 'Item added to cart successfully' };
+  export async function addToCart(email, id) {
+    try {
+      const existingCartItem = await client.db("dresses").collection("cart").findOne({ email });
+  
+      if (!existingCartItem) {
+        await client.db("dresses").collection("cart").insertOne({ email, id: [id] });
+        return { message: 'Item added to cart successfully' };
+      } else {
+        if (existingCartItem.id.includes(id)) {
+          return { message: 'Item already exists in the cart' };
+        } else {
+          await client.db("dresses").collection("cart").updateOne(
+            { email },
+            { $addToSet: { id: id } }
+          );
+          return { message: 'Item added to cart successfully' };
+        }
+      }
+    } catch (error) {
+      throw new Error('Error adding items to cart: ' + error.message)
     }
-  } catch (error) {
-    throw new Error('Error adding items to cart: ' + error.message)
   }
-}
 
-// Modify the getCartItems function to fetch dress objects based on IDs
+// get all cart items stored in the email
 export async function getCartItems(email) {
   try {
     const cart = await client.db("dresses").collection("cart").findOne({ email });
     if (!cart) {
-      return []; // Return an empty array if cart is not found
+      return []
     }
-
-    // Map through the IDs in the cart and fetch dress objects
-    const cartItems = await Promise.all(cart.id.map(async (id) => {
+    const cartItems = [];
+    for (const id of cart.id) {
       const dress = await client.db("dresses").collection("dresses").findOne({ id });
-      return dress; // Return the dress object
-    }));
+      cartItems.push(dress);
+    }
 
     return cartItems;
   } catch (error) {
@@ -83,10 +86,21 @@ export async function getCartItems(email) {
   }
 }
 
-export async function removeFromCart(email, id) {
-  return await client.db("dresses").collection("cart").updateOne(
-    { email },
-    { $pull: { items: { id: id } } }
-);
+/// deleting items with thier id
+export async function DeletingId(email, id) {
+  const existingItem=await client.db("dresses").collection("cart").findOne({id})
+  if(existingItem){
+  try {
+    await client.db("dresses").collection("cart").updateOne(
+      { email },
+      { $pull: { id: id } } 
+    )
+    return { message: 'Item deleted from cart successfully' };
+  } catch (error) {
+    throw new Error('Error deleting item from cart: ' + error.message)
+  }}
+  else{
+    return {message:"Item DoesNot Exist"}
+  }
 }
 

@@ -1,5 +1,5 @@
 import express from "express";
-import {genPassword,createUser,getUsersByEmail,getAllUsers,forgotPassword,resetPassword,DeleteUsersByEmail,addToCart,getCartItems,removeFromCart} from "../functions.js"
+import {genPassword,createUser,getUsersByEmail,getAllUsers,forgotPassword,resetPassword,DeleteUsersByEmail} from "../functions.js"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import nodemailer from 'nodemailer';

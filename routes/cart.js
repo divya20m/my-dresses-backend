@@ -1,6 +1,6 @@
 import express from "express";
 import { auth } from '../MiddleWare/auth.js';
-import {addToCart,getCartItems,removeFromCart} from "../functions.js";
+import {addToCart,getCartItems,DeletingId} from "../functions.js";
 
 const router=express.Router()
 
@@ -31,13 +31,13 @@ router.get('/', auth, async (req, res) => {
 });
 
 //deleting the cart id and quantity
-router.delete('/:id', auth,async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
     const { id } = req.params;
     const email = req.user.email; 
 
     try {
-        const result = await removeFromCart(email, id);
-        res.status(200).json({ message: 'Item deleted from cart successfully' });
+        const result = await DeletingId(email, id);
+        res.status(200).json(result)
     } catch (error) {
         console.error("Error deleting item from cart:", error);
         res.status(500).json({ error: "Internal server error" });
